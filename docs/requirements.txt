@@ -5,6 +5,5 @@ nbconvert
 nbformat
 sphinx-design
 sphinx-codeautolink
-furo
 pydata-sphinx-theme
 ipython

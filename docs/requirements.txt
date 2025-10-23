@@ -1,2 +1,10 @@
-ipykernel
+sphinx
+sphinx_gallery
 nbsphinx
+nbconvert
+nbformat
+sphinx-design
+sphinx-codeautolink
+furo
+pydata-sphinx-theme
+ipython

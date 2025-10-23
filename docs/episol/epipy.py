@@ -1,7 +1,6 @@
 import subprocess
 import os
 import threading
-#from pathlib import Path
 #import pandas as pd
 #import matplotlib.pyplot as plt
 
@@ -75,7 +74,6 @@ class epipy:
         # I wanted to get the file path without using the os package as it does NOT
         # I REPEAT NOT work well for distributed computing so please dont hate me for
         # what youre about to see
-        """
         self.structure_file = solute_structure.split('/')[-1] # get rid of the path
         if solute_structure.find('/') != -1:
             self.solute_path = '/'.join(solute_structure.split('/')[:-1])+"/" # this is goofy
@@ -87,9 +85,7 @@ class epipy:
             self.solute_top_path = '/'.join(solute_topology.split('/')[:-1])+"/"
         else:
             self.solute_top_path = ''
-        """
         # resume
-
         if gen_idc:
             convert = True
 
@@ -219,16 +215,7 @@ class epipy:
         out_file :: name for .log file
         **args :: command save strings
         """
-        ### CHANGE THIS
-        # it can include the path
-        if if not out_file_name:
-            if self.log == '':
-                print("looks like you dont have log file name")
-                print("We will name your log file for you")
-                self.log = "out.log"
-                print("Its name will be:",)
-             #out_file_name
-        ####
+        self.log = out_file_name
         cmd_string = " report:"
         for arg in args:
             cmd_string += f"{arg}"
@@ -477,7 +464,7 @@ object 3 class array type double rank 0 items {int(xs*ys*zs)} follows\n""")
       inputgrid:: md.Grid object
       outname:: string for pdb file
       num_waters_to_place:: number of waters to place
-      radius:: distance around selected point to omit from remaining placement in Angstrom
+      radius:: distance around selected point to omit from remaining placement
       ideal_radius = ((10**3)/(4/3)/(np.pi)/33.3679)**(1/3) based on number density of water
       grid_spacing:: conversion from array indices to angstrom, units of 1/A
       the program automatically converts for you but you can override if need be

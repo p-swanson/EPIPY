@@ -5,3 +5,8 @@ Includes:
 * Placement of waters 
 * post-processing and selection tools  
 
+
+## Website
+
+>[link](https://epipy.readthedocs.io/en/latest/)
+epipy.readthedocs.io/en/latest/

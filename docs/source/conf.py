@@ -9,10 +9,10 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'epipy documentation'
+project = 'EPIPY'
 copyright = '2025, pswanson'
 author = 'pswanson'
-release = '1'
+release = 'test'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

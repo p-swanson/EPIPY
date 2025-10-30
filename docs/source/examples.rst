@@ -3,6 +3,7 @@ Jupyter Notebook Tutorial Gallery
 
 Getting Started
 ^^^^^^^^^^^^^^^
+
 .. nbgallery::
    :glob:
    :maxdepth: 1

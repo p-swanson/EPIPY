@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Background for Integral Equation Theory and 3DRISM &#8212; Epipy Documentation 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installing Epipy and EPISOL" href="installation.html" />
+    <link rel="prev" title="epipy documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="background-for-integral-equation-theory-and-3drism">
+<h1>Background for Integral Equation Theory and 3DRISM<a class="headerlink" href="#background-for-integral-equation-theory-and-3drism" title="Link to this heading">¶</a></h1>
+<section id="correlation-functions-in-liquid">
+<h2>Correlation Functions in Liquid<a class="headerlink" href="#correlation-functions-in-liquid" title="Link to this heading">¶</a></h2>
+<p>Unlike implicit solvent models, which describe the solution surrounding the solute as a continuum, or explicit models, which account for all solvent degrees of freedom by representing the solution on an all-atom basis, Integral Equation Theory61 (IET), including 3DRISM, considers solvent density distributions. These distributions are most often expressed in the form of the radial distribution function (RDF), which represents the probability of finding a particle at a given distance from the atom of interest relative to the bulk solution. In MD simulations, the RDF is obtained by summing all individual atomic sites surrounding a reference site within increasingly larger spherical shells, then dividing the result by the shell volume and the bulk density (see Figure 1). Hence, the RDF can be viewed as the factor that multiplies the bulk density to yield the local density.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="_images/ach_rdf.png"><img alt="rdf" src="_images/ach_rdf.png" style="width: 750.0px; height: 250.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">RDF of water hydrogen around acetylcholine carbonyl oxygen. Left: representative snapshot of the simulation showing the shell width dr (blue arrow). Right: Plot of water hydrogen density around the carbonyl oxygen.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>To describe the correlation between particle densities, or how the density is impacted by the correlations between our given particle and all others, we define a radial distribution function g(r) and a total correlation function h(r):</p>
+<p><span class="math notranslate nohighlight">\(N_{ab}\left(r\right)=\frac{1}{n_{frames}}\sum_{s=1}^{n_{frames}}\sum_{i=1}^{n_a}\sum_{j=1}^{n_b}\delta\left(r_{ij}^s-r\right)\)</span></p>
+<p><span class="math notranslate nohighlight">\(g_{ab}\left(r\right)=\frac{N_{ab}\left(r\right)}{\rho_{total}^bV}\)</span></p>
+<p><span class="math notranslate nohighlight">\(h_{ab}\left(r\right)=g_{ab}\left(r\right)-1\)</span></p>
+</section>
+<section id="the-rism-equation">
+<h2>The RISM Equation<a class="headerlink" href="#the-rism-equation" title="Link to this heading">¶</a></h2>
+<p>From the work of Ornstein and Zernike it was proposed to decompose this total correlation function into two parts: direct c(r) and indirect correlation.  Where the direct part represents the correlation (arbitrarily numbered) atom 1 has on atom 2, and the indirect part represents the correlation exerted on atom 2, by atom 3, given atom 3 correlation with atom 1 (see Figure 2).</p>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="_images/correlations.png"><img alt="c_r" src="_images/correlations.png" style="width: 750.0px; height: 250.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The RDF and the OZ equation. Right: Example of g(r) versus h(r) for a simple Lennard-Jones liquid at equilibrium (Kobb-Andersen misture at T = 1) Left: schematic depicting the components of the OZ equation, where direct c(r) considers correlation between atom 1 and atom 2, and indirect, which considers how atom 2 is influenced by atom 1 via atom 1’s correlation with neighboring particles.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>This equation can be readily solved for simple LJ systems, but becomes increasingly difficult when considering non spherical molecules, as one must include molecular shape and orientation into the equation, resulting in a 6-dimensional problem with x, y, z position and <span class="math notranslate nohighlight">\(\psi\)</span>, <span class="math notranslate nohighlight">\(\theta\)</span>, <span class="math notranslate nohighlight">\(\phi\)</span> orientation. To combat this, Chandler and Andersen proposed the reference-interaction-site-model (RISM) where the molecules in the system are approximated by the use of integral equations that rely only on the distance between sites. These ‘sites’ are the spherically symmetric atoms in a molecule and the correlations between them depend only on a 1-dimensional distance. The equation includes our previously defined, direct and indirect terms, but a third term is introduced: intramolecular correlation,:math: <cite>omega(r)</cite> which represents the correlation between atoms in the same molecule. In RISM, both solute-solute and solvent-solvent correlations are defined as simple delta functions. <span class="math notranslate nohighlight">\((s_{ij}\left(r\right)=\delta\left(r-b_{ij}\right))\)</span>, where b is the bond length between atoms in the same molecule delta is the Dirac delta function and the subscripts represent two given sites i, and j. Since considerations rely only on distance r RISM results in <span class="math notranslate nohighlight">\(N_{sites}\times N_{sites}\)</span> equations:</p>
+<p><span class="math notranslate nohighlight">\(h_{ab}\left(\mathbf{r}_{ab}\right)=\sum_{c,d}\iint{\omega_{ac}\left(r_{ac}\right)c_{cd}\left(\mathbf{r}_{cd}\right)\chi_{db}\left(\mathbf{r}_{db}\right)\rho_c^b\rho_d^bd\mathbf{r}_cd\mathbf{r}_d}\)</span></p>
+<p>where the solvent susceptibility function is a combination of intra <span class="math notranslate nohighlight">\((\omega_{ab})\)</span> and inter-molecular <span class="math notranslate nohighlight">\((h_{ab})\)</span> correlations:</p>
+<p><span class="math notranslate nohighlight">\(\chi_{ab}\left(\mathbf{r}_{ab}\right)=\omega_{ab}\left(r_{ab}\right)+h_{ab}\left(\mathbf{r}_{ab}\right)\)</span></p>
+<p><span class="math notranslate nohighlight">\(\omega_{ab}\left(r_{ab}\right)=\delta_{ab}\delta\left(r_{ab}\right)+\delta\left(r_{ab}-b_{ab}\right)\)</span></p>
+<p>Where a and b are labels of two liquid sites. b_{ab} is the fixed distance between site a and b if these two sites appear in the same molecule. For homogenous liquids, <span class="math notranslate nohighlight">\(h_{ab}\left(\mathbf{r}_{ab}\right)=h_{ab}\left(r_{ab}\right)\)</span>.
+In particular, for the solute-solvent system where the solute is infinite dilute, the RISM equation for the solute-solvent correlation is written as the following form called the 3DRISM equation:</p>
+<p><span class="math notranslate nohighlight">\(h_v\left(\mathbf{r}_{uv}\right)=\sum_{v^\prime}\iint{c_{v^\prime}\left(\mathbf{r}_{v^\prime}\right)\chi_{vv^\prime}\left(r_{vv^\prime}\right)\rho_{v^\prime}^bd\mathbf{r}_{v^\prime}}\)</span></p>
+<p>Here, v and <span class="math notranslate nohighlight">\(v\prime\)</span> represent solvent sites, <span class="math notranslate nohighlight">\(\rho_{v^\prime}^b\)</span>  is the bulk density of solvent site <span class="math notranslate nohighlight">\(v\prime\)</span>, <span class="math notranslate nohighlight">\(h_v\left(\mathbf{r}\right)=\rho_v\left(\mathbf{r}\right)/\rho_{v^b}-1\)</span> is called the total correlation function of solvent site v at grid location <span class="math notranslate nohighlight">\(\mathbf{r}\)</span>, <span class="math notranslate nohighlight">\(c_v(r)\)</span> is the direct correlation function. <span class="math notranslate nohighlight">\(r_{vv^\prime}\ \ =\ |r_v\ -\ r_{v^\prime}|\)</span> is the distance between two solvent sites v and <span class="math notranslate nohighlight">\(v\prime\)</span>, <span class="math notranslate nohighlight">\(h_{vv^\prime}(r_{vv^\prime})\)</span> is the inter-solvent density distribution that computed from MD simulations or 1DRISM.</p>
+</section>
+<section id="closure-equations">
+<h2>Closure Equations<a class="headerlink" href="#closure-equations" title="Link to this heading">¶</a></h2>
+<p>The 3DRISM equation involves two unknown quantities, the total and direct correlations, where an additional equation called the closure relation is needed to numerically solve the total and direct correlation functions. In general, the closure equation takes the following math form:</p>
+<p><span class="math notranslate nohighlight">\(h_v\left(\mathbf{r}\right)=e^{-u_v\left(\mathbf{r}\right)/k_BT+h_v\left(\mathbf{r}\right)-c_v\left(\mathbf{r}\right)+B_v\left(\mathbf{r}\right)}-1\)</span></p>
+<p>Here <span class="math notranslate nohighlight">\(u_v(r)\)</span> is the potential energy of solvent site v at <span class="math notranslate nohighlight">\(\mathbf{r}\)</span> that generated by all solute sites, computed via a molecular forcefield. <span class="math notranslate nohighlight">\(k_B\)</span> is the Boltzmann constant and T is the temperature. <span class="math notranslate nohighlight">\(B_v(r)\)</span> is called the bridge diagram term, which includes all high order terms induced by many body effects involving more than four particles (one solute atom and three solvent grids). To solve the 3DRISM equation, the closure equation is applied to Eq. (5) in a self-consistent manner, until the error between the current iteration and the previous one is less than an arbitrary value – usually in the range of <span class="math notranslate nohighlight">\({10}^{-4}\)</span> to <span class="math notranslate nohighlight">\({10}^{-8}\)</span>.
+In practice, the accurate calculation of <span class="math notranslate nohighlight">\(B_v(\mathbf{r})\)</span> is not implementable and the true form is not known. Consequently, approximations are required for the closure equation. The simplest being the hyper-netted-chain (HNC) closure, which completely ignores <span class="math notranslate nohighlight">\(B_v(\mathbf{r})\)</span>:</p>
+<p>In practice, the HNC closure will lead to divergence of the 3DRISM calculations, especially for larger solutes. The partial series expansion (PSE-n) closure considers n orders of the polynomial expansion of the exponential function used in HNC.</p>
+<p><span class="math notranslate nohighlight">\(h_v\left(\mathbf{r}\right)=\left\{\begin{matrix}e^{-u_v\left(\mathbf{r}\right)/k_BT+h_v\left(\mathbf{r}\right)-c_v\left(\mathbf{r}\right)}-1&amp;h_v\left(\mathbf{r}\right)\le 0\\\sum_{m=1}^{n}\frac{\left(-u_v\left(\mathbf{r}\right)/k_BT+h_v\left(\mathbf{r}\right)-c_v\left(\mathbf{r}\right)\right)^m}{m!}&amp;h_v\left(\mathbf{r}\right)\geq 0\\\end{matrix}\right.\)</span></p>
+<p>At n=1, (PSE-1) the closure is referred to as the Kovalenko-Hirata (KH) closure67, 68. The HNC, PSE-n and KH closures are the more commonly used closures. With respect to biomolecules, KH, PSE-2 and PSE-3 are used more frequently.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/out_4.png" alt="Logo of Epipy Documentation"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">Epipy Documentation</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Background for Integral Equation Theory and 3DRISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing Epipy and EPISOL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episol.html">episol package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Jupyter Notebook Tutorial Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">epipy documentation</a></li>
+      <li>Next: <a href="installation.html" title="next chapter">Installing Epipy and EPISOL</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, pswanson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/background.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>episol package &#8212; Epipy Documentation 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Jupyter Notebook Tutorial Gallery" href="examples.html" />
+    <link rel="prev" title="Installing Epipy and EPISOL" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="episol-package">
+<h1>episol package<a class="headerlink" href="#episol-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="episol-basic-tests-module">
+<h2>episol.basic_tests module<a class="headerlink" href="#episol-basic-tests-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-episol.epipy">
+<span id="episol-epipy-module"></span><h2>episol.epipy module<a class="headerlink" href="#module-episol.epipy" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="episol.epipy.epipy">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">episol.epipy.</span></span><span class="sig-name descname"><span class="pre">epipy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solute_structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solute_topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_gro</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_idc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recenter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">10,</span> <span class="pre">10]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.UC">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.UC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.UC" title="Link to this definition">¶</a></dt>
+<dd><p>Function to get universal correction (UC) based on the closure
+used for RISM calculation.
+—————————-
+function returns a dictionaryy containing both the FEP and
+experimental correction constants ‘A’ and ‘B’ in the equation:
+delta G^{solv} = mu^{ex}+’A’<a href="#id1"><span class="problematic" id="id2">*</span></a>V_m+’B’, where V_m is partial molar volume
+from the free energy universal correction proposed by:
+David S Palmer, Andrey I Frolov, Ekaterina L Ratkova and Maxim V Fedorov
+<a class="reference external" href="http://dx.doi.org/10.1088/0953-8984/22/49/492101">http://dx.doi.org/10.1088/0953-8984/22/49/492101</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_to_extract</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.dump" title="Link to this definition">¶</a></dt>
+<dd><section id="extracts-the-compressed-ts4s-file-and-writes-to-a-txt-file">
+<h3>Extracts the compressed .ts4s file and writes to a txt file<a class="headerlink" href="#extracts-the-compressed-ts4s-file-and-writes-to-a-txt-file" title="Link to this heading">¶</a></h3>
+<p>file_name :: dump file to read
+out_name :: extract files to this txt file
+list_values :: return list of saved values
+value_to_extract :: given the list of values select index to extract</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.err">
+<span class="sig-name descname"><span class="pre">err</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.err"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.err" title="Link to this definition">¶</a></dt>
+<dd><p>This function reads a log file and returns
+the SCF stdev in an array
+========================
+log_file_name :: string, name of .log file
+======================== Returns
+out_arr :: np.array() with shape (1, # steps)
+array index represents the SCF step</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.extract_grid">
+<span class="sig-name descname"><span class="pre">extract_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'guv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.extract_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.extract_grid" title="Link to this definition">¶</a></dt>
+<dd><p>This function extracts calc. data from the dump file
+by searching for the value corresponding to the selection string
+This way you dont need to list values to extract them</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file</strong> (<em>str</em>)</p></li>
+<li><p><strong>sele</strong> (<em>str</em>)</p></li>
+<li><p><strong>out_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.free_energy">
+<span class="sig-name descname"><span class="pre">free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kj/mol'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'EXP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.free_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Return the free energy of the most recent calculation according to the
+3DRISM object
+====================
+fit_value: string, energy value to return
+options:
+EXP : experimental fitting
+FEP : free energy of pertubation fitting
+====================
+conv: sting expression
+default output unit is in !!!! in KJ/mol !!!!
+can specify what units you want to convert to
+by specifying the expression. Function will return
+the value based on original unit convversion
+e.g
+“kcal” resolves to taking original free energy value
+in Kj/mol and multipying it by (1/Kj)*(2kcal)*1mol to convert
+to kcal
+———– keyword Options: ———–
+kcal, mol , kj, j , joule
+——— all other standard math symbols allowed ———–</p>
+<p>delta G^{solv} = mu^{ex}+’A’<a href="#id3"><span class="problematic" id="id4">*</span></a>V_m+’B’, where V_m is partial molar volume</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conv</strong> (<em>str</em>)</p></li>
+<li><p><strong>fit_value</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.get_help">
+<span class="sig-name descname"><span class="pre">get_help</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.get_help"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.get_help" title="Link to this definition">¶</a></dt>
+<dd><section id="searches-episol-by-calling-help-from-the-cli">
+<h3>searches episol by calling –help from the CLI<a class="headerlink" href="#searches-episol-by-calling-help-from-the-cli" title="Link to this heading">¶</a></h3>
+<p>search_str :: string to search for</p>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>search_str</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.get_version">
+<span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.get_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.get_version" title="Link to this definition">¶</a></dt>
+<dd><p>returns the version by simply calling episol kernel
+from the command line</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.kernel">
+<span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.kernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.kernel" title="Link to this definition">¶</a></dt>
+<dd><p>v :: int(), verbose rating
+nt :: int(), number of threads to use</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.placement">
+<span class="sig-name descname"><span class="pre">placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_waters_to_place</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.9269073728633292</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_pdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out.pdb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.placement" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_waters_to_place</strong> (<em>int</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.reader">
+<span class="sig-name descname"><span class="pre">reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">laplacian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LoG</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.52</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.reader" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes in an uncompressed dump file txt file
+it reads the grid size and shape
+If specified we can save/export to a dx file which can be loaded into pymol/vmd/etc.
+=================================
+file_in :: the decompress txt file from our ts4s dump command
+grid_spacing :: [x,y,z] values for delta grid, e.g. grid spacing of 0.5A would
+have grid_spacing = [0.5,0.5,0.5]
+———- IF DX=TRUE —————
+file_out :: filename for saved dx file
+################# WARNINGS ################
+since the dx file was made by IBM in the 90s
+many nont-so-modern softwares will struggle to read
+dx files with comments and it appears many follow their own
+format specifications</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_in</strong> (<em>str</em>)</p></li>
+<li><p><strong>laplacian</strong> (<em>bool</em>)</p></li>
+<li><p><strong>LoG</strong> (<em>bool</em>)</p></li>
+<li><p><strong>convolve</strong> (<em>bool</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>file_out</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.report" title="Link to this definition">¶</a></dt>
+<dd><p>function specifies the name of the .log file and
+which params to write out into it
+file name can be specified with self.log as well
+================================================
+out_file :: name for .log file
+<a href="#id5"><span class="problematic" id="id6">**</span></a>args :: command save strings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out_file_name</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.rism">
+<span class="sig-name descname"><span class="pre">rism</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.rism"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.rism" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the steps and resolution of the calculation.
+Will automatically set number of grids based on the box dimensions
+acquired from self.solute()
+=======================================================
+step :: int(), Number of SCF steps to perform
+resolution :: int(), grid resolution of box (will override if previously set)
+args :: string(), values to save to the dump file; options below:
+++++++++++++++++++++++++++ SAVE ARGS ++++++++++++++++++++++++++
+all : reports all of the below
+command : save the exact command that was run when the file was produced
+guv : g(r) foreach grid point
+ld : smoothed g(r)  i.e. g(r) convolved with kernel
+coul : coulombic potential at each grid
+excess : mu^ex at each grid</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.select_around">
+<span class="sig-name descname"><span class="pre">select_around</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rism_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">around</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.select_around"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.select_around" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.select_coords">
+<span class="sig-name descname"><span class="pre">select_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sele</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_sele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_fact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.select_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.select_coords" title="Link to this definition">¶</a></dt>
+<dd><p>in_file: .gro file
+sele: selection string -&gt; resname only so far
+returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_file</strong> (<em>str</em>)</p></li>
+<li><p><strong>sele</strong> (<em>str</em>)</p></li>
+<li><p><strong>atom_sele</strong> (<em>str</em>)</p></li>
+<li><p><strong>conv_fact</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.select_grid">
+<span class="sig-name descname"><span class="pre">select_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'guv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.select_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.select_grid" title="Link to this definition">¶</a></dt>
+<dd><section id="select-values-in-array-based-on-the-selection-input-string">
+<h3>select values in array based on the selection input string<a class="headerlink" href="#select-values-in-array-based-on-the-selection-input-string" title="Link to this heading">¶</a></h3>
+<p>so far selection string is limited to selection of
+grid-values around single residue names only: i.e. around 4 resname LYS
+But we reccommend using the coordinate array input for more in-depth selections
+:::::: in the future the selection commands will be updated ::::::
+==================================================
+input_string : value to select and extract
+- default value is guv (atomic density)
+if a selection is made value is passed to -&gt; self.get_coords -&gt; self.extract
+else -&gt; self.extract
+==================================================
+selection string can include the following key-words
+any output value from 3DRISM, i.e ‘guv’, ‘uuv’ or ‘coul’ etc. etc.
+around ‘distance’ :: select grid values around coordinates within specified distance (in Angstrom)
+get :: get the exact grid value on the input coordinates (i.e. resname or coord_array)
+resname :: any 3-letter cannonical residue name, upper or lower case
+‘laplace’ or ‘laplacian’ or ‘lap’ or ‘grad’ or ‘gradient’ or ‘del’ :: return laplacian of the whole grid
+this selection can be used in tandem with ‘around’ and ‘get’ but will always return the laplacian of the
+original unmasked grid, and NOT the laplacian of the selection region.
+‘convolve’ or ‘log’ or ‘laplacian of gaussian’ :: return the grid convolved with a laplacian of gaussian (LoG)
+filter. Same specification as above
+sigma :: stdev. for gaussian kernel in the LoG filter
+———————————————
+! All other strings will be ignored.
+! resname will override any array input
+———————————————
+example selection
+self.select_grid(‘LoG of guv with sigma 3 around 4 resname MOL’)
+creates laplacian of gaussian of the g(r) grid with a gaussian std. of 3,
+then selects the region around 4 A of all atoms in the residue named ‘MOL’
+!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!! MESSY, NEEDS SOME WORK</p>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.solute">
+<span class="sig-name descname"><span class="pre">solute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solute_structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solute_topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_gro</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_idc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recenter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">10,</span> <span class="pre">10]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.solute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.solute" title="Link to this definition">¶</a></dt>
+<dd><p>solute_structure :: .gro, .pdb or .xtc file
+solute_topology :: .top or .solte file
+gen_idc :: bool, generate an ion-dipole-correction (IDC) enabled .solute file
+this file will be used for the remainder of the calculation
+convert :: convert solute_topology to .solute file</p>
+<p>========== IF GROMACS ====================
+- requirements: GROMACS installed and properlly sourced
+to_gro :: convert solute_structure file to .gro using pdb2gmx
+recenter :: recenter solute incenter of box using gmx -edifconf</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.solvent">
+<span class="sig-name descname"><span class="pre">solvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solvent_topology</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.solvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.solvent" title="Link to this definition">¶</a></dt>
+<dd><p>Reads the solvent topology file.
+If no file specified, will default search
+the site-packages dir where episol.epipy is
+stored. this may fail as the os package sometimes
+encounters errors
+=================================
+solvent_topology :: solvent correlation file
+——————————-
+if solvent topology is set to None i.e. has no input
+then we will select the tip3p 0.01A file from the source directory
+of EPIPY, this way to avoid annoying paths</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="episol.epipy.epipy.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.test" title="Link to this definition">¶</a></dt>
+<dd><section id="calls-episol-and-adds-test-flag-to-the-cli">
+<h3>Calls episol and adds -test flag to the CLI<a class="headerlink" href="#calls-episol-and-adds-test-flag-to-the-cli" title="Link to this heading">¶</a></h3>
+<p>v :: int(), verbose rating
+nt :: int(), number of threads to use</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="episol-fileutils-module">
+<h2>episol.fileutils module<a class="headerlink" href="#episol-fileutils-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-episol">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-episol" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/out_4.png" alt="Logo of Epipy Documentation"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">Epipy Documentation</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background for Integral Equation Theory and 3DRISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing Epipy and EPISOL</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">episol package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Jupyter Notebook Tutorial Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installing Epipy and EPISOL</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Jupyter Notebook Tutorial Gallery</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, pswanson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/episol.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

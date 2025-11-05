@@ -62,12 +62,15 @@ This writes the relevant grid-based data to a .ts4s file, and epipy will automat
 
 :code:`data = example.select_grid('guv')`
 
-See our example library for example calculations
+See our example library for example calculations..
+
+Why?
+----
+I originally created epipy for use in high-throughput calculations across a distributed computing environment. It calls on the `EPISOL <https://github.com/EPISOLrelease/EPISOL>`_. library to perform 3DRISM calculations. I made epipy fit into one file/module to make it as efficient as possible. Big updates are planned so stay tuned, and  report any bugs/issues `here <https://github.com/EPISOLrelease/EPIPY>`_.
 
 How to cite
 -----------
 
-If you liked this. please cite :)
+If you liked this. please cite:
 
-DOI: coming 
-
+Swanson, P. C.; Cao, S.; Huang, X. A Python Tutorial for 3DRISM Solvation Calculations of Chemical and Biological Molecules. The Journal of Chemical Physics 2025, 163 (17). https://doi.org/10.1063/5.0299937.

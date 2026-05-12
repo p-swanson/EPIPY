@@ -36,3 +36,12 @@ High Throughput Small-Molecule Solvation Free Energy
 
    examples/solvation_free_energy/*
 
+Using Oragnic Solvents
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. nbgallery::
+   :glob:
+   :maxdepth: 1
+
+   examples/organic_solvent/*
+

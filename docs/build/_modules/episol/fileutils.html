@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>episol.fileutils &#8212; Epipy Documentation 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <script src="../../_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for episol.fileutils</h1><div class="highlight"><pre>
+<span></span>
+<span class="c1">#49 43 58 43 20 4E 49 4B 41</span>
+<span class="c1">#-------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">series of functions for modifying and synthesizng</span>
+<span class="sd">files related to 3DRISM calculation.</span>
+
+<span class="sd">-------------------------------------------------</span>
+<span class="sd">**************** GPL-3.0 License.****************</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span><span class="o">,</span><span class="nn">datetime</span>
+
+<div class="viewcode-block" id="try_getpass">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.try_getpass">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_getpass</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    getpass.getuser() will fail when using a docker</span>
+<span class="sd">    container where the PID and UID is not copied into</span>
+<span class="sd">    the container. You can combat this yourself when</span>
+<span class="sd">    pulling an image. BUT you dont have a choice if you</span>
+<span class="sd">    are using someone elses (your uni or job) scheduling</span>
+<span class="sd">    software. As it pulls it for you, and they probably</span>
+<span class="sd">    dont transfer your UID.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uname</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">uname</span> <span class="o">=</span> <span class="s2">&quot;couldnt retrive username&quot;</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">uname</span></div>
+
+
+<div class="viewcode-block" id="make_filename">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.make_filename">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  check to see if filename exists</span>
+<span class="sd">  then append indices to the name</span>
+<span class="sd">  until theres no match...</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  :param filename: name of file to write to</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+  <span class="c1"># TODO: make pythonic</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;out&quot;</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;.txt&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">name</span><span class="o">+</span><span class="n">suffix</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">name</span><span class="o">+</span><span class="n">suffix</span>
+
+  <span class="c1">#flag = True</span>
+  <span class="n">counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+
+  <span class="k">while</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">counter</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">counter</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+      <span class="n">tmp</span> <span class="o">=</span><span class="s2">&quot;&quot;&quot;uhh.. you have over 10,000 files with the same name ...</span>
+<span class="s2">            Im not going to help you out anymore ...&quot;&quot;&quot;</span>
+      <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">filename</span></div>
+
+
+<div class="viewcode-block" id="debugger">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.debugger">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">debugger</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Debug tool.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param msg: Message to print</span>
+<span class="sd">    :param tp: Prints message each time its called.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">tp</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_print_flag</span> <span class="o">=</span> <span class="n">tp</span>
+<div class="viewcode-block" id="debugger.db">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.debugger.db">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">db</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">new_msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">to_print_flag</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span><span class="n">new_msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_msg</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="amber_inp">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.amber_inp">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">amber_inp</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Manipulate an amber[1] .inp file for 1DRISM calculations.</span>
+<span class="sd">  this function reads in an amber .inp file for 1DRISM</span>
+<span class="sd">  calculations as a dictionary. and allows the user to change</span>
+<span class="sd">  parameters. This is useful as amber 1DRISM will create a .sav file</span>
+<span class="sd">  after each run and as long as you dont change grid spacing or length.</span>
+<span class="sd">  it will reuse the previous run results (.sav). allowing for quick convergence.</span>
+
+<span class="sd">  Example usage:</span>
+<span class="sd">  ```</span>
+<span class="sd">  temps = [i for i in range(100,1000,100)]</span>
+<span class="sd">  density = [10,20,... etc]</span>
+<span class="sd">  input_1drism = amber_inp(&quot;molecule.inp&quot;)</span>
+<span class="sd">  # then loop through thermo values and redo 1DRISM</span>
+<span class="sd">  for dens,temp in zip(density,temps):</span>
+<span class="sd">      input_1drism.temp = temp</span>
+<span class="sd">      input_1drism.desnity = dens</span>
+<span class="sd">      input_1drism.write() # overwrites existing file</span>
+<span class="sd">      os.system(&quot;rism1d molecule&quot;)</span>
+<span class="sd">      ... do something ...</span>
+<span class="sd">      etc.</span>
+<span class="sd">  ```</span>
+
+<span class="sd">  References</span>
+<span class="sd">  ----------</span>
+<span class="sd">  [1] AmberTools</span>
+<span class="sd">  D.A. Case, H.M. Aktulga, K. Belfon, D.S. Cerutti, G.A. Cisneros, V.W.D. Cruz eiro, N. Forouzesh, T.J. Giese, A.W. Götz, H. Gohlke, S. Izadi, K. Kasavajhala, M.C. Kaymak, E. King, T. Kurtzman, T.-S. Lee, P. Li, J. Liu, T. Luchko, R. Luo, M. Manathunga, M.R. Machado, H.M. Nguyen, K.A. O’Hearn, A.V. Onufriev, F. Pan, S. Pantano, R. Qi, A. Rahnamoun, A. Risheh, S. Schott-Verdugo, A. Shajan, J. Swails, J. Wang, H. Wei, X. Wu, Y. Wu, S. Zhang, S. Zhao, Q. Zhu, T.E. Cheatham III, D.R. Roe, A.  Roitberg, C. Simmerling, D.M. York, M.C. Nagan, and K.M. Merz Jr. AmberTools. J. Chem. Inf. Model. 63, 6183-6191 (2023).</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">outname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># should import some stuff about os but</span>
+    <span class="n">debug_msg</span> <span class="o">=</span> <span class="s2">&quot;# [ AMBER INP ]:&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">debugger</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="n">debug_msg</span><span class="p">,</span><span class="n">debug</span><span class="p">)</span>
+    <span class="c1">#pass</span>
+
+    <span class="c1">#def read_inp(cls,filename:str,outname:str=None):</span>
+    <span class="c1"># TODO: if no filename, create empty dict</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">outname</span><span class="p">:</span>
+      <span class="n">outname</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">outname</span> <span class="o">=</span> <span class="n">outname</span>
+    <span class="c1"># open file and read, looking for pointers SPECIES and PARAMETERS</span>
+    <span class="c1"># i made this in a hurry so dont judge me okay?</span>
+    <span class="n">linecount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+    <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OPENING FILE </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+        <span class="n">linecount</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;!&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="p">:</span>
+            <span class="k">continue</span>
+
+          <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">):</span>
+            <span class="c1"># test SPECIES and PARAMETERS</span>
+            <span class="c1">#cls[&quot;SPECIES&quot;]</span>
+            <span class="n">t_key</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="c1"># if species, add new name so we dont overwrite</span>
+
+            <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FOUND </span><span class="si">{</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t_key</span> <span class="o">==</span> <span class="s2">&quot;SPECIES&quot;</span><span class="p">:</span>
+              <span class="bp">self</span><span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;TMP_MDL&quot;</span><span class="p">:{}}</span> <span class="c1"># for multiple species</span>
+            <span class="k">else</span><span class="p">:</span>
+              <span class="bp">self</span><span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{}</span>
+          <span class="c1">###########################################</span>
+          <span class="c1">#                 READ IN DATA</span>
+          <span class="c1">###########################################</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t_key</span><span class="o">==</span><span class="s2">&quot;PARAMETERS&quot;</span><span class="p">:</span>
+              <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">t_data</span><span class="p">:</span>
+                <span class="n">t_items</span> <span class="o">=</span> <span class="n">items</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">spec_key</span> <span class="o">=</span> <span class="n">t_items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">spec_val</span> <span class="o">=</span> <span class="n">t_items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING KEY:</span><span class="si">{</span><span class="n">spec_key</span><span class="si">}</span><span class="s2">; VALUE: </span><span class="si">{</span><span class="n">spec_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">t_key</span><span class="p">][</span><span class="n">spec_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec_val</span>
+          <span class="c1">###########################################</span>
+
+            <span class="k">if</span> <span class="n">t_key</span><span class="o">==</span><span class="s2">&quot;SPECIES&quot;</span><span class="p">:</span>
+              <span class="n">tmp_data</span> <span class="o">=</span> <span class="p">[]</span>
+              <span class="c1"># need to find model name first</span>
+              <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">t_data</span><span class="p">:</span>
+                <span class="n">t_items</span> <span class="o">=</span> <span class="n">items</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">spec_key</span> <span class="o">=</span> <span class="n">t_items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">spec_val</span> <span class="o">=</span> <span class="n">t_items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING KEY:</span><span class="si">{</span><span class="n">spec_key</span><span class="si">}</span><span class="s2">; VALUE: </span><span class="si">{</span><span class="n">spec_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1">######### if we hit the model (i.e. end)</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">t_key</span><span class="p">][</span><span class="s2">&quot;TMP_MDL&quot;</span><span class="p">][</span><span class="n">spec_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec_val</span>
+                <span class="k">if</span> <span class="n">spec_key</span><span class="o">==</span><span class="s2">&quot;MODEL&quot;</span><span class="p">:</span>
+                  <span class="n">mdl</span> <span class="o">=</span> <span class="n">spec_key</span>
+                  <span class="n">mdl_name</span> <span class="o">=</span> <span class="n">spec_val</span>
+                  <span class="c1">#TODO: fix</span>
+                  <span class="bp">self</span><span class="p">[</span><span class="n">t_key</span><span class="p">][</span><span class="n">mdl_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">t_key</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;TMP_MDL&quot;</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="p">[</span><span class="n">spec_key</span><span class="p">,</span><span class="n">spec_val</span><span class="p">]</span> <span class="ow">in</span> <span class="n">tmp_data</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">t_key</span><span class="p">][</span><span class="n">mdl_name</span><span class="p">][</span><span class="n">spec_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec_val</span>
+                <span class="k">else</span><span class="p">:</span>
+                  <span class="n">tmp_data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">spec_key</span><span class="p">,</span><span class="n">spec_val</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+          <span class="k">continue</span>
+    <span class="k">return</span>
+
+<div class="viewcode-block" id="amber_inp.write">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.amber_inp.write">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">outname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write out to new mdl</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: if os.system exists, rename</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">outname</span><span class="p">:</span>
+      <span class="bp">cls</span><span class="o">.</span><span class="n">outname</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">filename</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">cls</span><span class="o">.</span><span class="n">outname</span> <span class="o">=</span> <span class="n">outname</span>
+    <span class="n">linecount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+    <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WRITING TO </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">outname</span><span class="si">}</span><span class="s2">; WARNING THIS WILL OVERWRITE&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">outname</span><span class="p">,</span><span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&amp;PARAMETERS</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;PARAMETERS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WRITING PARAMETERS; KEY:</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">; VALUE: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;NSP&quot;</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;SPECIES&#39;</span><span class="p">])</span>
+          <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">,&quot;</span><span class="p">)</span>
+
+        <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">/&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;SPECIES&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&amp;SPECIES</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+          <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;SPECIES&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debugger</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WRITING SPECIES; KEY:</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">; VALUE: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">,&quot;</span><span class="p">)</span>
+          <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">/&quot;</span><span class="p">)</span>
+        <span class="c1">#r.write(&quot;\n/\n&quot;)</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FAILED AT STAGE:</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> ON LINE:</span><span class="si">{</span><span class="n">linecount</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">exc</span><span class="p">)</span>
+
+    <span class="k">return</span></div>
+
+  <span class="c1"># TODO: make these properties</span>
+<div class="viewcode-block" id="amber_inp.species">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.amber_inp.species">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">species</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;SPECIES&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="amber_inp.params">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.amber_inp.params">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">params</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;PARAMETERS&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="amber_inp.add_mdl">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.amber_inp.add_mdl">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">add_mdl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">mdlname</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    need to update NSP if new species is added</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;SPECIES&quot;</span><span class="p">][</span><span class="n">mdlname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s2">&quot;&#39;g/cm^3&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;DENSITY&#39;</span><span class="p">:</span> <span class="s1">&#39;1.7D0&#39;</span><span class="p">,</span> <span class="s1">&#39;MODEL&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">mdlname</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">}</span>
+    <span class="c1">#for (key,val) in cls[&quot;SPECIES&quot;].items():</span>
+    <span class="k">return</span></div>
+</div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">read_gvv_and_get_names</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">name_row</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  read GVV file into pandas df</span>
+<span class="sd">  and get names</span>
+
+<span class="sd">  parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  :param infile: GVV file to read in (from amber 1DRISM)</span>
+<span class="sd">  :param name_row: row in the infile containing the column names</span>
+<span class="sd">  :param debug: run verbose</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1">#############################</span>
+  <span class="c1">#         PARAMS</span>
+  <span class="c1">#############################</span>
+  <span class="n">debug_msg</span> <span class="o">=</span> <span class="s2">&quot;# [ AMBER INP ]:&quot;</span>
+  <span class="n">db</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="n">debug_msg</span><span class="p">,</span><span class="n">debug</span><span class="p">)</span>
+  <span class="c1">############# GET NAMES #####</span>
+  <span class="n">counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rr</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rr</span><span class="p">:</span>
+      <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="n">name_row</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+          <span class="n">names</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">names</span> <span class="o">=</span> <span class="n">line</span>
+  <span class="c1">############################</span>
+  <span class="k">return</span> <span class="n">names</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">gvv_to_df</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">skiprows</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  read amber 1drism .gvv file and return a</span>
+<span class="sd">  pandas dataframe with proper headers</span>
+
+<span class="sd">  parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  :param infile: file to read in</span>
+<span class="sd">  :param skiprows: skip these rows, pass to pandas.read_csv</span>
+<span class="sd">  :param debug: run verbose</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+  <span class="c1">#rism_1d_data =</span>
+  <span class="n">names</span> <span class="o">=</span> <span class="n">read_gvv_and_get_names</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="n">skiprows</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+
+<div class="viewcode-block" id="read_top">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_top">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">read_top</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  read topology and assign parameters and names, then write out</span>
+<span class="sd">  to .solvent file for episol/epipy</span>
+
+<span class="sd">  Parameters:</span>
+<span class="sd">  ------------</span>
+<span class="sd">  :param infile: .top file to read</span>
+<span class="sd">  :param debug: run verbose</span>
+
+<span class="sd">  :warning: ATOMS MUST BE ORDERED THE SAME FOR NAME SWAPPING</span>
+<span class="sd">  GROMACS ORDERING OF TOPOLOGY IS ASSUMED (sorry i need atom names first)</span>
+<span class="sd">  bondingtype MUST BE EMPTY (usually is)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">infile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># mole_name atom_name mass charge sigma epsilon</span>
+    <span class="c1"># or</span>
+    <span class="c1"># name      mole idx grp      charge       sigma     epsilon</span>
+    <span class="n">read_flag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mol_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mol_double_counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="s2">&quot;# [ LOAD TOP ]: &quot;</span><span class="p">,</span><span class="n">debug</span><span class="p">)</span>
+    <span class="c1">#self.debug_flag =</span>
+    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># TODO: optimize</span>
+    <span class="n">pointer_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;atomtypes&#39;</span><span class="p">,</span><span class="s1">&#39;atoms&#39;</span><span class="p">]</span>
+    <span class="n">t_hold_key</span> <span class="o">=</span> <span class="s1">&#39;tmp&#39;</span><span class="c1">#&#39;[ atomtypes ]&#39;</span>
+    <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING FILE:</span><span class="si">{</span><span class="n">infile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">line_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+    <span class="c1">####################################################</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rr</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rr</span><span class="p">:</span>
+        <span class="n">line_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[ </span><span class="se">\n</span><span class="s2"> ]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="c1"># tried doing next(fid) and stuff but this is what works best</span>
+            <span class="c1"># even if its kind of janky.</span>
+            <span class="c1">#stage = self.debug.db(f&quot;READING LINE {tmp}&quot;)</span>
+            <span class="c1">#print(tmp)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+              <span class="n">to_get</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+              <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING HEADER </span><span class="si">{</span><span class="n">to_get</span><span class="si">}</span><span class="s2">, LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+              <span class="c1">#TODO: FIX</span>
+              <span class="k">if</span> <span class="n">to_get</span> <span class="ow">in</span> <span class="n">pointer_keys</span><span class="p">:</span>
+                <span class="c1"># temporry hold this key</span>
+                <span class="n">t_hold_key</span> <span class="o">=</span> <span class="n">to_get</span>
+                <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HIT HEADER </span><span class="si">{</span><span class="n">t_hold_key</span><span class="si">}</span><span class="s2">, LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># use it until we hit a different key</span>
+                <span class="c1"># sub keys wont register a hit</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">t_hold_key</span><span class="o">==</span><span class="s2">&quot;atomtypes&quot;</span><span class="p">:</span>
+              <span class="c1"># then we read in sigma and eps and atom nam</span>
+              <span class="c1">#print(line.split())</span>
+              <span class="k">if</span> <span class="n">tmp</span><span class="p">:</span>
+                <span class="n">t_name</span><span class="p">,</span><span class="n">_1</span><span class="p">,</span><span class="n">_2</span><span class="p">,</span><span class="n">_3</span><span class="p">,</span><span class="n">_4</span><span class="p">,</span><span class="n">t_sigma</span><span class="p">,</span><span class="n">t_eps</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+              <span class="k">else</span><span class="p">:</span>
+                <span class="n">t_hold_key</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+                <span class="k">continue</span>
+              <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="s2">&quot;t_name,t_sigma,t_eps&quot;</span><span class="p">)</span>
+              <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_sigma</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_eps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+              <span class="c1"># need to make sure we dont double up on mol names...</span>
+              <span class="k">if</span> <span class="n">t_name</span> <span class="ow">in</span> <span class="n">mol_names</span><span class="p">:</span>
+                <span class="n">mol_double_counter</span> <span class="o">+=</span><span class="mi">1</span>
+                <span class="n">t_name</span> <span class="o">=</span> <span class="n">t_name</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mol_double_counter</span><span class="si">}</span><span class="s2">&quot;</span>
+              <span class="n">mol_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_name</span><span class="p">)</span>
+              <span class="c1"># load em up</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">]</span>     <span class="o">=</span> <span class="p">{}</span> <span class="c1"># TODO: fix</span>
+              <span class="c1">################# NEW MOL #######################</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;mole&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="nb">str</span><span class="p">()</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">int</span><span class="p">()</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;grp&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">int</span><span class="p">()</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;charge&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">()</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;sigma&quot;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">t_sigma</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;epsilon&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">t_eps</span>
+              <span class="c1">#t_name,t_mol,t_index,t_grp,t_charge,t_sigma,t_eps</span>
+            <span class="k">if</span> <span class="n">t_hold_key</span><span class="o">==</span><span class="s2">&quot;atoms&quot;</span><span class="p">:</span>
+              <span class="c1">#then read in mol names and charge</span>
+              <span class="c1">#    1 MOL0_0       1 MOL0     C          1      0.878333333333     12.010780000000</span>
+              <span class="k">if</span> <span class="n">tmp</span><span class="p">:</span>
+                <span class="n">t_ind</span><span class="p">,</span><span class="n">t_mol</span><span class="p">,</span><span class="n">t_grp</span><span class="p">,</span><span class="n">t_res</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">t_charge</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+              <span class="k">else</span><span class="p">:</span>
+                <span class="n">t_hold_key</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span>
+                <span class="k">continue</span>
+              <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="s2">&quot;t_mol,t_ind,t_grp&quot;</span><span class="p">)</span>
+              <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t_mol</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_ind</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_grp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_mol</span><span class="p">][</span><span class="s2">&quot;mole&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">t_res</span><span class="p">)</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_mol</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">t_ind</span><span class="p">)</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_mol</span><span class="p">][</span><span class="s2">&quot;grp&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">t_ind</span><span class="p">)</span> <span class="c1"># TEMP</span>
+              <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_mol</span><span class="p">][</span><span class="s2">&quot;charge&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t_charge</span><span class="p">)</span> <span class="c1"># TEMP</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+          <span class="k">continue</span>
+
+    <span class="c1">####################################################</span>
+    <span class="k">return</span>
+
+<div class="viewcode-block" id="read_top.to_solv">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_top.to_solv">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_solv</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    pass to an empty solvent reader and init with</span>
+<span class="sd">    the .top data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">read_solvent</span><span class="p">()</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">set_atoms</span><span class="p">(</span><span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;molecules&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">pdb</span><span class="p">:</span>
+      <span class="c1">#tmp.set_bonds(get_bond_len_and_names(pdb_filename,debug=cls.debug))</span>
+      <span class="n">tmp</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="n">get_bond_len_and_names</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">to_print_flag</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tmp</span></div>
+
+
+
+<div class="viewcode-block" id="read_top.load_pdb">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_top.load_pdb">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">load_pdb</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">pdb_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    match names from pdbfile,</span>
+<span class="sd">    take names from pdbfile and rename sol file</span>
+<span class="sd">    names are ordered anyways... but be careful</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param pdb_filename: path to pdbfile</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">################################### TODO: FIX</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_pdb</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      take names from pdbfile and rename sol file</span>
+<span class="sd">      names are ordered anyways... but be careful</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rr</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rr</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETAM&quot;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">out_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">=</span><span class="n">res</span>
+      <span class="k">return</span> <span class="n">out_dict</span>
+    <span class="c1">###################################</span>
+    <span class="c1">#cls.bonds = get_bond_len_and_names(pdb_filename,debug=cls.debug)</span>
+    <span class="c1"># keep track of the pdb we read in</span>
+    <span class="bp">cls</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pdb_filename</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">match_pdb</span><span class="p">(</span><span class="n">pdb_filename</span><span class="p">)</span>
+    <span class="c1">#TODO: FIX</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">),(</span><span class="n">exisiting_key</span><span class="p">,</span><span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span><span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+      <span class="c1"># since everything is ordered</span>
+      <span class="c1">#print(f&quot;{val}.{key}&quot;)</span>
+      <span class="c1">#self[t_key][mdl_name] = self[t_key].pop(&quot;TMP_MDL&quot;)</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">exisiting_key</span><span class="p">)</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;mole&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="bp">cls</span></div>
+
+
+<div class="viewcode-block" id="read_top.load_gro">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_top.load_gro">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">load_gro</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">pdb_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># TODO: load .gro file</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="read_top.write">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_top.write">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">outname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    write to a .sol file for use in epipy calculations</span>
+<span class="sd">    ```</span>
+<span class="sd">    epipy.solvent(out.sol)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param outname: name of .sol file, defaults to out</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">outname</span><span class="p">:</span>
+      <span class="c1"># TODO: os. exists rename</span>
+      <span class="n">outname</span> <span class="o">=</span> <span class="n">make_filename</span><span class="p">(</span><span class="s2">&quot;out.sol&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outname</span><span class="p">,</span><span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ww</span><span class="p">:</span>
+      <span class="c1"># TODO: getpass.getuser() datetime.datetime()</span>
+      <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[atom]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;molecules</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">ww</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">ww</span><span class="p">)</span>
+        <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">cls</span></div>
+</div>
+
+
+<div class="viewcode-block" id="read_solvent">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_solvent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">read_solvent</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    this function reads in the .solvent file containing pairwise info</span>
+<span class="sd">    about the solvent. i.e. sigmas and epsilons</span>
+
+<span class="sd">    you can start by reading in an existing .top file, or create an</span>
+<span class="sd">    empty obj then specify the parameters.</span>
+
+<span class="sd">    basically, need to store pairwise info and bond info and bulk</span>
+<span class="sd">    correlation info.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param solvent_file: .top file containing pairwise atom and bond info etc. info</span>
+<span class="sd">    :param debug: run verbose</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">solvent_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1">#super().__init__()</span>
+        <span class="n">debug_msg</span> <span class="o">=</span> <span class="s2">&quot;# [ READ SOLV ]:&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="n">debug_msg</span><span class="p">,</span><span class="n">debug</span><span class="p">)</span>
+        <span class="c1">################################ INIT DICT ################################</span>
+        <span class="c1"># create empty dictionary</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;[solvent]&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ff&quot;</span><span class="p">:</span><span class="s2">&quot;oplsaa&quot;</span><span class="p">,</span><span class="s2">&quot;rvdw&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;rcoul&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;gvv&quot;</span><span class="p">:{</span><span class="s2">&quot;spacing&quot;</span><span class="p">:</span><span class="nb">float</span><span class="p">(),</span><span class="s2">&quot;file&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">()},</span><span class="s2">&quot;density&quot;</span> <span class="p">:</span><span class="mi">1</span> <span class="p">,</span><span class="s2">&quot;bulk-density&quot;</span><span class="p">:</span><span class="mi">1</span> <span class="p">,</span><span class="s2">&quot;dipole&quot;</span><span class="p">:</span><span class="mi">0</span> <span class="p">,</span><span class="s2">&quot;dielect&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;[atom]&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="p">{}</span><span class="c1">#{&quot;name&quot;:str(),&quot;mole&quot;:str(),&quot;idx&quot;:int(),&quot;grp&quot;:int(),&quot;charge&quot;:int(),&quot;sigma&quot;:int(),&quot;epsilon&quot;:int()}</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;[bond]&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="p">{}</span><span class="c1">#{&quot;atom1&quot;:str(),&quot;atom2&quot;:str(),&quot;bond(nm)&quot;:float()}</span>
+
+        <span class="c1"># not required.. make printing easier</span>
+        <span class="c1">#self[&quot;[gvv_map]&quot;]  = {}#{&quot;atom1&quot;:str(),&quot;atom2&quot;:str()}</span>
+        <span class="c1">#self[&quot;[zeta]&quot;]     = {}#{}</span>
+        <span class="c1">################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span> <span class="c1"># keep track of atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span> <span class="c1"># keep track of bonds</span>
+        <span class="c1">################################################################</span>
+        <span class="c1">#                   IF FILE INPUT</span>
+        <span class="c1">################################################################</span>
+        <span class="k">if</span> <span class="n">solvent_file</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">solvent_file</span> <span class="o">=</span> <span class="n">solvent_file</span>
+          <span class="n">t_hold_key</span> <span class="o">=</span><span class="s2">&quot;[solvent]&quot;</span> <span class="c1">#TODO: FIX</span>
+          <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solvent_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+          <span class="n">line_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+          <span class="c1">################################################################</span>
+          <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvent_file</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ww</span><span class="p">:</span>
+              <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ww</span><span class="p">:</span>
+                <span class="n">line_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">try</span><span class="p">:</span>
+                  <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                  <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="c1">#[0]</span>
+                    <span class="c1">#stage = self.debug.db(f&quot;READING LINE {tmp}&quot;)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                      <span class="n">to_get</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                      <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING HEADER </span><span class="si">{</span><span class="n">to_get</span><span class="si">}</span><span class="s2">, LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="w">                      </span><span class="sd">&quot;&quot;&quot;to_get = tmp[0]#.strip()</span>
+<span class="sd">                      val_out = tmp[1]&quot;&quot;&quot;</span>
+                      <span class="c1">#TODO: FIX</span>
+                      <span class="k">if</span> <span class="n">to_get</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="c1"># temporry hold this key</span>
+                        <span class="n">t_hold_key</span> <span class="o">=</span> <span class="n">to_get</span>
+                        <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HIT HEADER </span><span class="si">{</span><span class="n">t_hold_key</span><span class="si">}</span><span class="s2">, LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># use it until we hit a different key</span>
+                        <span class="c1"># sub keys wont register a hit</span>
+                        <span class="k">continue</span>
+                    <span class="c1">############################### &quot;[solvent]&quot; #################################</span>
+                    <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING HEADER </span><span class="si">{</span><span class="n">t_hold_key</span><span class="si">}</span><span class="s2">, LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># solvent pointer is columwise</span>
+                    <span class="k">if</span> <span class="n">t_hold_key</span><span class="o">==</span><span class="s2">&quot;[solvent]&quot;</span><span class="p">:</span>
+                      <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING [solvent], LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                      <span class="k">if</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;gvv&#39;</span><span class="p">:</span>
+                        <span class="c1"># gvv has two entires: grid spacing (nm) and filename..</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="s1">&#39;gvv&#39;</span><span class="p">]</span><span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spacing&quot;</span><span class="p">:</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s2">&quot;file&quot;</span><span class="p">:</span><span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+                      <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c1">#############################    &quot;[atom]&quot;   ###################################</span>
+                    <span class="c1"># TODO: make a list of dicts so you can call self[&#39;atom&#39;][-1] etc.</span>
+                    <span class="k">if</span> <span class="n">t_hold_key</span><span class="o">==</span><span class="s2">&quot;[atom]&quot;</span><span class="p">:</span>
+                      <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING [atom], LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                      <span class="c1"># add new input for each atom name TODO: fix</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s2">&quot;mole&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s2">&quot;idx&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s2">&quot;grp&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s2">&quot;charge&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span>
+                                                  <span class="s2">&quot;sigma&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s2">&quot;epsilon&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">()}</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span>    <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;mole&quot;</span><span class="p">]</span> <span class="o">=</span>    <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span> <span class="p">]</span> <span class="o">=</span>    <span class="nb">int</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;grp&quot;</span> <span class="p">]</span> <span class="o">=</span>    <span class="nb">int</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;charge&quot;</span> <span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;sigma&quot;</span>  <span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span><span class="p">][</span><span class="s2">&quot;epsilon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+                      <span class="c1"># then, we can just loop through keys.. i think</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">atom_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1">################################################################</span>
+                    <span class="k">if</span> <span class="n">t_hold_key</span><span class="o">==</span><span class="s2">&quot;[bond]&quot;</span><span class="p">:</span>
+                      <span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING [bond], LINE </span><span class="si">{</span><span class="n">line_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                      <span class="c1"># need to combine atoms so we dont overwrite</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_count</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s2">&quot;distance&quot;</span><span class="p">:</span><span class="nb">float</span><span class="p">(),</span><span class="s2">&quot;stdev&quot;</span><span class="p">:</span><span class="nb">float</span><span class="p">()}</span><span class="c1">#[&quot;name&quot;]</span>
+                      <span class="n">t_bonded_atoms</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+                      <span class="c1">#print(t_bonded_atoms)</span>
+                      <span class="c1">#OLD self[t_hold_key][t_bonded_atoms]= tmp[-1]</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_count</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_bonded_atoms</span>
+                      <span class="bp">self</span><span class="p">[</span><span class="n">t_hold_key</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_count</span><span class="p">][</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                      <span class="c1"># TODO: check for std dev and allow to add</span>
+                      <span class="c1"># TODO: here -&gt; self[t_hold_key][self.bond_count][&quot;&quot;] =</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">bond_count</span> <span class="o">+=</span><span class="mi">1</span>
+                    <span class="c1"># TEST</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                  <span class="k">continue</span>
+          <span class="c1">################################ INIT DICT ################################</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;EPISOL solvent topology with </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">atom_count</span><span class="si">}</span><span class="s2"> atoms and </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">bond_count</span><span class="si">}</span><span class="s2"> correlations&gt;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="n">outstr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+      <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print(key)#,val)</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="c1">############## printing will differ for each pointer ##############</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[solvent]&quot;</span><span class="p">:</span>
+              <span class="k">for</span> <span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key2</span><span class="o">==</span><span class="s2">&quot;gvv&quot;</span><span class="p">:</span>
+                  <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key2</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">val2</span><span class="p">[</span><span class="s1">&#39;spacing&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">val2</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                  <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key2</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">val2</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[gvv_map]&quot;</span><span class="p">:</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;# atom1</span><span class="se">\t</span><span class="s2">atom2</span><span class="se">\t</span><span class="s2">column</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                <span class="c1">#print(key2,val2)</span>
+                <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;atom1&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;atom2&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[bond]&quot;</span><span class="p">:</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;# atom1</span><span class="se">\t</span><span class="s2">atom2</span><span class="se">\t</span><span class="s2">distance</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="k">for</span> <span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1">#print(key2,val2)</span>
+                <span class="c1"># key2 is index</span>
+                <span class="c1">#for (key3,val3) in val2.items():</span>
+                <span class="n">atom1</span><span class="p">,</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">val2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">val2</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span>
+                <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">atom1</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">atom2</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[atom]&quot;</span><span class="p">:</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;# name</span><span class="se">\t</span><span class="s2">mol</span><span class="se">\t</span><span class="s2">idx</span><span class="se">\t</span><span class="s2">grp</span><span class="se">\t</span><span class="s2">charge</span><span class="se">\t</span><span class="s2">sigma</span><span class="se">\t</span><span class="s2">epsilon</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="k">for</span> <span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1">#print(key2,val2)</span>
+                <span class="c1">#{&#39;name&#39;: &#39;C0&#39;, &#39;mole&#39;: &#39;UNK&#39;, &#39;idx&#39;: 1, &#39;grp&#39;: 1, &#39;charge&#39;: 0.878333, &#39;sigma&#39;: 0.339967, &#39;epsilon&#39;: 0.87864}</span>
+                <span class="c1">#outstr += f&quot;{key2}\t{val2}\n&quot;</span>
+                <span class="c1">#outstr += f&quot;{val2[&#39;atom1&#39;]}\t{val2[&#39;atom2&#39;]}\t{}\n&quot;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">key3</span><span class="p">,</span><span class="n">val3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                  <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val3</span><span class="si">}</span><span class="se">\t</span><span class="s2">&quot;</span>
+                <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+      <span class="k">return</span> <span class="n">outstr</span>
+    <span class="c1"># TODO: add load_params from amber</span>
+    <span class="c1"># TODO: .atoms .bonds</span>
+    <span class="c1">####################################</span>
+    <span class="c1">#           SET PROPERTIES         #</span>
+    <span class="c1">####################################</span>
+    <span class="c1"># I though it&#39;d be cool to use properties</span>
+    <span class="c1"># but I needed to swap and return dif classes</span>
+    <span class="c1"># so now I will keep both</span>
+<div class="viewcode-block" id="read_solvent.set_atoms">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_solvent.set_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_atoms</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="bp">cls</span><span class="o">.</span><span class="n">atom_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+      <span class="c1">#TODO: make better TODO: dont look</span>
+      <span class="k">for</span> <span class="n">ind</span><span class="p">,(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="c1">#print(key,val)</span>
+        <span class="c1"># dont look</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="n">tt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val2</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s1">&#39;mol&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s1">&#39;idx&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s1">&#39;grp&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s1">&#39;charge&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(),</span><span class="s1">&#39;sigma&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(),</span><span class="s1">&#39;epsilon&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">()}</span><span class="c1">#key:val}</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">dd</span><span class="p">,</span><span class="n">vi</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span><span class="n">tt</span><span class="p">):</span>
+          <span class="c1">#print(dd,vi)</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">][</span><span class="n">dd</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span></div>
+
+
+<div class="viewcode-block" id="read_solvent.set_bonds">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_solvent.set_bonds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_bonds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      set bonds.</span>
+<span class="sd">      Parameters</span>
+<span class="sd">      ----------</span>
+<span class="sd">      :param vals: set from an list of tuples with the format [ (res.atom1-res.atom2, distance), ... ]</span>
+
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="c1"># allow to set bond vals</span>
+      <span class="c1"># [t_dict[&quot;name&quot;] for t_dict in cls[&#39;[bond]&#39;].values()]</span>
+      <span class="c1">#TODO: make better</span>
+      <span class="c1">#for (t_dict,val) in zip(cls[&#39;[bond]&#39;].values(),vals):</span>
+      <span class="c1">#  t_dict[&quot;name&quot;] = val</span>
+      <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
+          <span class="c1">#TODO</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;stdev&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="read_solvent.set_bond_length">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_solvent.set_bond_length">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_bond_length</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1"># allow to set bond vals</span>
+      <span class="c1"># [t_dict[&quot;name&quot;] for t_dict in cls[&#39;[bond]&#39;].values()]</span>
+      <span class="c1">#TODO: make better</span>
+      <span class="k">if</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t_dict</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span><span class="n">vals</span><span class="p">):</span>
+          <span class="n">t_dict</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#{0: {&#39;name&#39;: &#39;UNK.C0-UNK.O1&#39;, &#39;distance&#39;: &#39;0.124000&#39;, &#39;stdev&#39;: 0.0},</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
+          <span class="c1">#TODO</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;UNK.C0-UNK.O1&#39;</span><span class="p">,</span> <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">,</span> <span class="s1">&#39;stdev&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="read_solvent.set_gvv_map">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_solvent.set_gvv_map">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_gvv_map</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1"># if they input a dictionary</span>
+      <span class="k">if</span> <span class="s1">&#39;[gvv_map]&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># list so we can index values??</span>
+      <span class="bp">cls</span><span class="o">.</span><span class="n">bond_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="c1"># TODO: change bond_count to corr_count</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">==</span><span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># then read it in</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">==</span><span class="nb">list</span><span class="p">:</span>
+        <span class="c1"># must be a list of column mappings</span>
+        <span class="c1"># so create automatically via atom order</span>
+        <span class="c1"># CHECK if mapping is correct?</span>
+        <span class="c1">#{&#39;name&#39;: &#39;C0&#39;, &#39;mole&#39;: &#39;UNK&#39;, &#39;idx&#39;: 1}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a bad idea anyways, i will add in later though&quot;</span><span class="p">)</span>
+      <span class="c1"># os is file then open file and read in and match column names</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c1"># clean</span>
+        <span class="n">t_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+          <span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span> <span class="o">=</span> <span class="n">vals</span>
+          <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING GVV DATA FROM FILE: </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s1">&#39;gvv&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span>
+          <span class="c1"># read names</span>
+          <span class="n">names</span> <span class="o">=</span> <span class="n">read_gvv_and_get_names</span><span class="p">(</span><span class="n">t_file</span><span class="p">)</span> <span class="c1"># only returns atom names</span>
+          <span class="n">t</span> <span class="o">=</span> <span class="n">gvv_to_df</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="c1"># need to get spacing (in A)</span>
+          <span class="c1">#t.SEPARATION.diff()[1]</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s1">&#39;gvv&#39;</span><span class="p">][</span><span class="s1">&#39;spacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">SEPARATION</span><span class="o">.</span><span class="n">diff</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+          <span class="k">del</span> <span class="n">t</span> <span class="c1"># idk</span>
+          <span class="c1">#[&#39;SEPARATION&#39;, &#39;C0:C0&#39;, &#39;O1:C0&#39;, &#39;O1:O1&#39;, &#39;O2:C0&#39;, &#39;O2:O1&#39;, &#39;O2:O2&#39;]</span>
+          <span class="c1"># check to see if atom names match the names read in by self[&#39;[atom]&#39;]</span>
+          <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="c1"># just read atomnames from names and see how that goes for now</span>
+            <span class="k">try</span><span class="p">:</span>
+              <span class="k">if</span> <span class="n">name</span><span class="o">!=</span><span class="s2">&quot;SEPARATION&quot;</span><span class="p">:</span>
+                <span class="n">atom1</span><span class="p">,</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="c1"># amber sep</span>
+                <span class="c1">#cls[&quot;[gvv_map]&quot;][ind][&#39;atom1&#39;]   = atom1</span>
+                <span class="c1">#cls[&quot;[gvv_map]&quot;][ind][&quot;atom2&quot;]   = atom2</span>
+                <span class="c1">#cls[&quot;[gvv_map]&quot;][ind][&#39;column&#39;]  = ind+1</span>
+                <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;atom1&#39;</span><span class="p">:</span><span class="n">atom1</span><span class="p">,</span><span class="s2">&quot;atom2&quot;</span><span class="p">:</span><span class="n">atom2</span><span class="p">,</span><span class="s1">&#39;column&#39;</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">})</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+              <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;# [ READ SOLV ]: FAILED READING GVV FILE&quot;</span><span class="p">,</span><span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span><span class="p">)</span>
+              <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span></div>
+
+    <span class="c1">####################################</span>
+    <span class="c1">#        ACTUAL PROPERTIES         #</span>
+    <span class="c1">####################################</span>
+    <span class="c1"># TODO: just use my set_func in place</span>
+    <span class="c1"># of setters</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atoms</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      return list of atom dict..</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+    <span class="nd">@atoms</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atoms</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      read in entire dict per atom</span>
+<span class="sd">      from read_top</span>
+
+<span class="sd">      format example:</span>
+
+<span class="sd">      [{&#39;name&#39;: &#39;C0&#39;,</span>
+<span class="sd">      &#39;mole&#39;: &#39;UNK&#39;,</span>
+<span class="sd">      &#39;idx&#39;: 1,</span>
+<span class="sd">      &#39;grp&#39;: 1,</span>
+<span class="sd">      &#39;charge&#39;: 0.878333,</span>
+<span class="sd">      &#39;sigma&#39;: 0.339967,</span>
+<span class="sd">      &#39;epsilon&#39;: 0.87864},</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="c1">#TODO: make better TODO: dont look</span>
+      <span class="k">for</span> <span class="n">ind</span><span class="p">,(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="c1">#print(key,val)</span>
+        <span class="c1"># dont look</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="n">tt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val2</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s1">&#39;mol&#39;</span><span class="p">:</span><span class="nb">str</span><span class="p">(),</span><span class="s1">&#39;idx&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s1">&#39;grp&#39;</span><span class="p">:</span><span class="nb">int</span><span class="p">(),</span><span class="s1">&#39;charge&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(),</span><span class="s1">&#39;sigma&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(),</span><span class="s1">&#39;epsilon&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">()}</span><span class="c1">#key:val}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">dd</span><span class="p">,</span><span class="n">vi</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span><span class="n">tt</span><span class="p">):</span>
+          <span class="c1">#print(dd,vi)</span>
+          <span class="n">x</span><span class="p">[</span><span class="s1">&#39;[atom]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">][</span><span class="n">dd</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bonds</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">[</span><span class="n">t_dict</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">t_dict</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="nd">@bonds</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bonds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1"># allow to set bond vals</span>
+      <span class="c1"># [t_dict[&quot;name&quot;] for t_dict in cls[&#39;[bond]&#39;].values()]</span>
+      <span class="c1">#TODO: make better</span>
+      <span class="c1">#for (t_dict,val) in zip(cls[&#39;[bond]&#39;].values(),vals):</span>
+      <span class="c1">#    t_dict[&quot;name&quot;] = val</span>
+      <span class="bp">cls</span><span class="o">.</span><span class="n">set_bonds</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+    <span class="c1">############ BOND LEN ############</span>
+    <span class="c1"># TODO: add stdev</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bond_length</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">t_dict</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">t_dict</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="nd">@bond_length</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bond_length</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1"># allow to set bond vals</span>
+      <span class="c1"># [t_dict[&quot;name&quot;] for t_dict in cls[&#39;[bond]&#39;].values()]</span>
+      <span class="c1">#TODO: make better</span>
+      <span class="k">if</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t_dict</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span><span class="n">vals</span><span class="p">):</span>
+          <span class="n">t_dict</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#{0: {&#39;name&#39;: &#39;UNK.C0-UNK.O1&#39;, &#39;distance&#39;: &#39;0.124000&#39;, &#39;stdev&#39;: 0.0},</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
+          <span class="c1">#TODO add stdev</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[bond]&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;UNK.C0-UNK.O1&#39;</span><span class="p">,</span> <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">,</span> <span class="s1">&#39;stdev&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+
+    <span class="c1">############ BULK PARAMS ############</span>
+    <span class="c1"># TODO: add atom params ?</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ff</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;ff&quot;</span><span class="p">]</span>
+    <span class="nd">@ff</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ff</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;ff&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rvdw</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;rvdw&quot;</span><span class="p">]</span>
+    <span class="nd">@rvdw</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rvdw</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1">#assert type(vals) == str, &quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;rvdw&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rcoul</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;rcoul&quot;</span><span class="p">]</span>
+    <span class="nd">@rcoul</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rcoul</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1">#assert type(vals) == str, &quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;rcoul&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">density</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
+    <span class="nd">@density</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">density</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1">#assert type(vals) == str, &quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bulk_density</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;bulk-density&quot;</span><span class="p">]</span>
+    <span class="nd">@bulk_density</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bulk_density</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1">#assert type(vals) == str, &quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;bulk-density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dipole</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;dipole&quot;</span><span class="p">]</span>
+    <span class="nd">@dipole</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dipole</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1">#assert type(vals) == str, &quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;dipole&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dielect</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      dielectric constant for bulk solv</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;dielect&quot;</span><span class="p">]</span>
+    <span class="nd">@dielect</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dielect</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1">#assert type(vals) == str, &quot;MUST BE STR&quot;</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s2">&quot;dielect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+
+    <span class="c1">############ GVV MAP ############</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gvv_map</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+      <span class="n">help_</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">      assign pairwise correlations from</span>
+<span class="s2">      an existing file columnwise.</span>
+
+<span class="s2">      layout</span>
+<span class="s2">      -------------------------------------------------</span>
+<span class="s2">      # atom1       |   atom2      |  column in gvv file</span>
+<span class="s2">      index or name |index or name |        int</span>
+<span class="s2">      -------------------------------------------------</span>
+<span class="s2">      where gvv file name is read from self[&#39;[solvent]&#39;][&#39;gvv&#39;][&#39;file&#39;]</span>
+<span class="s2">      &quot;&quot;&quot;</span>
+      <span class="c1"># check to see if exists</span>
+      <span class="k">if</span> <span class="s1">&#39;[gvv_map]&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># list so we can index values??</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">]</span>
+
+    <span class="nd">@gvv_map</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gvv_map</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
+      <span class="c1"># if they input a dictionary</span>
+      <span class="k">if</span> <span class="s1">&#39;[gvv_map]&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># list so we can index values??</span>
+
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">==</span><span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># then read it in</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">==</span><span class="nb">list</span><span class="p">:</span>
+        <span class="c1"># must be a list of column mappings</span>
+        <span class="c1"># so create automatically via atom order</span>
+        <span class="c1"># CHECK if mapping is correct?</span>
+        <span class="c1">#{&#39;name&#39;: &#39;C0&#39;, &#39;mole&#39;: &#39;UNK&#39;, &#39;idx&#39;: 1}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this is a bad idea anyways, i will add in later though&quot;</span><span class="p">)</span>
+      <span class="c1"># os is file then open file and read in and match column names</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c1"># clean</span>
+        <span class="n">t_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+          <span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span> <span class="o">=</span> <span class="n">vals</span>
+          <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING GVV DATA FROM FILE: </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s1">&#39;gvv&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span>
+          <span class="c1"># read names</span>
+          <span class="n">names</span> <span class="o">=</span> <span class="n">read_gvv_and_get_names</span><span class="p">(</span><span class="n">t_file</span><span class="p">)</span> <span class="c1"># only returns atom names</span>
+          <span class="n">t</span> <span class="o">=</span> <span class="n">gvv_to_df</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="c1"># need to get spacing (in A)</span>
+          <span class="c1">#t.SEPARATION.diff()[1]</span>
+          <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[solvent]&#39;</span><span class="p">][</span><span class="s1">&#39;gvv&#39;</span><span class="p">][</span><span class="s1">&#39;spacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">SEPARATION</span><span class="o">.</span><span class="n">diff</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+          <span class="k">del</span> <span class="n">t</span> <span class="c1"># idk</span>
+          <span class="c1">#[&#39;SEPARATION&#39;, &#39;C0:C0&#39;, &#39;O1:C0&#39;, &#39;O1:O1&#39;, &#39;O2:C0&#39;, &#39;O2:O1&#39;, &#39;O2:O2&#39;]</span>
+          <span class="c1"># check to see if atom names match the names read in by self[&#39;[atom]&#39;]</span>
+          <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="c1"># just read atomnames from names and see how that goes for now</span>
+            <span class="k">try</span><span class="p">:</span>
+              <span class="k">if</span> <span class="n">name</span><span class="o">!=</span><span class="s2">&quot;SEPARATION&quot;</span><span class="p">:</span>
+                <span class="n">atom1</span><span class="p">,</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="c1"># amber sep</span>
+                <span class="c1">#cls[&quot;[gvv_map]&quot;][ind][&#39;atom1&#39;]   = atom1</span>
+                <span class="c1">#cls[&quot;[gvv_map]&quot;][ind][&quot;atom2&quot;]   = atom2</span>
+                <span class="c1">#cls[&quot;[gvv_map]&quot;][ind][&#39;column&#39;]  = ind+1</span>
+                <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;[gvv_map]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;atom1&#39;</span><span class="p">:</span><span class="n">atom1</span><span class="p">,</span><span class="s2">&quot;atom2&quot;</span><span class="p">:</span><span class="n">atom2</span><span class="p">,</span><span class="s1">&#39;column&#39;</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">})</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+              <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;# [ READ SOLV ]: FAILED READING GVV FILE&quot;</span><span class="p">,</span><span class="bp">cls</span><span class="o">.</span><span class="n">gvv_file</span><span class="p">)</span>
+              <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+
+      <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;!!! MUST BE DICT OR LIST OR FILENAME, DEBUG FOR MORE INFO !!!&quot;</span><span class="p">)</span>
+
+
+
+    <span class="c1">#######################################</span>
+
+<div class="viewcode-block" id="read_solvent.write">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_solvent.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">filename</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># TODO</span>
+        <span class="c1"># TODO print warning if no gvv file</span>
+        <span class="c1"># TODO: make this part of debugger</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+          <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;out.sol&quot;</span>
+          <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="n">counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+          <span class="k">while</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+              <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;out_</span><span class="si">{</span><span class="n">counter</span><span class="si">}</span><span class="s2">.sol&quot;</span>
+              <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+              <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PREPARING TO WRITE TO </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1">##################################</span>
+        <span class="k">try</span><span class="p">:</span>
+          <span class="n">usr</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span> <span class="c1"># this fails on docker sometimes...</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+          <span class="n">usr</span> <span class="o">=</span> <span class="s2">&quot;IDK&quot;</span>
+        <span class="n">outstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;# WRITTEN BY: </span><span class="si">{</span><span class="n">usr</span><span class="si">}</span><span class="s2"> AT: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="c1">#print(key)#,val)</span>
+          <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+          <span class="c1">############## printing will differ for each pointer ##############</span>
+          <span class="k">if</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[solvent]&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+              <span class="k">if</span> <span class="n">key2</span><span class="o">==</span><span class="s2">&quot;gvv&quot;</span><span class="p">:</span>
+                <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key2</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">val2</span><span class="p">[</span><span class="s1">&#39;spacing&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">val2</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="k">else</span><span class="p">:</span>
+                <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key2</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">val2</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+          <span class="k">elif</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[gvv_map]&quot;</span><span class="p">:</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;# atom1</span><span class="se">\t</span><span class="s2">atom2</span><span class="se">\t</span><span class="s2">column</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+              <span class="c1">#print(key2,val2)</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;atom1&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;atom2&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+          <span class="k">elif</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[bond]&quot;</span><span class="p">:</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;# atom1</span><span class="se">\t</span><span class="s2">atom2</span><span class="se">\t</span><span class="s2">distance</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+              <span class="c1">#print(key2,val2)</span>
+              <span class="c1"># key2 is index</span>
+              <span class="c1">#for (key3,val3) in val2.items():</span>
+              <span class="n">atom1</span><span class="p">,</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">val2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+              <span class="n">d</span> <span class="o">=</span> <span class="n">val2</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">atom1</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">atom2</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+          <span class="k">elif</span> <span class="n">key</span><span class="o">==</span><span class="s2">&quot;[atom]&quot;</span><span class="p">:</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;# name</span><span class="se">\t</span><span class="s2">mol</span><span class="se">\t</span><span class="s2">idx</span><span class="se">\t</span><span class="s2">grp</span><span class="se">\t</span><span class="s2">charge</span><span class="se">\t</span><span class="s2">sigma</span><span class="se">\t</span><span class="s2">epsilon</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">val2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+              <span class="c1">#print(key2,val2)</span>
+              <span class="c1">#{&#39;name&#39;: &#39;C0&#39;, &#39;mole&#39;: &#39;UNK&#39;, &#39;idx&#39;: 1, &#39;grp&#39;: 1, &#39;charge&#39;: 0.878333, &#39;sigma&#39;: 0.339967, &#39;epsilon&#39;: 0.87864}</span>
+              <span class="c1">#outstr += f&quot;{key2}\t{val2}\n&quot;</span>
+              <span class="c1">#outstr += f&quot;{val2[&#39;atom1&#39;]}\t{val2[&#39;atom2&#39;]}\t{}\n&quot;</span>
+              <span class="k">for</span> <span class="p">(</span><span class="n">key3</span><span class="p">,</span><span class="n">val3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">val2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">outstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val3</span><span class="si">}</span><span class="se">\t</span><span class="s2">&quot;</span>
+              <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">outstr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ww</span><span class="p">:</span>
+          <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outstr</span><span class="p">)</span>
+        <span class="n">stage</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WROTE TO </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1">#return outstr</span>
+        <span class="k">return</span></div>
+</div>
+
+
+<span class="c1">##############################################################################</span>
+<span class="c1">#                           HELPER FUNCTIONS</span>
+<span class="c1">##############################################################################</span>
+
+<div class="viewcode-block" id="read_gvv_and_get_names">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.read_gvv_and_get_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_gvv_and_get_names</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">name_row</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  read GVV file into pandas df</span>
+<span class="sd">  and get names</span>
+
+<span class="sd">  parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  :param infile: GVV file to read in (from amber 1DRISM)</span>
+<span class="sd">  :param name_row:  row in the infile containing the column names</span>
+<span class="sd">  :param debug: run verbose</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1">#############################</span>
+  <span class="c1">#         PARAMS</span>
+  <span class="c1">#############################</span>
+  <span class="n">debug_msg</span> <span class="o">=</span> <span class="s2">&quot;# [ AMBER INP ]:&quot;</span>
+  <span class="n">db</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="n">debug_msg</span><span class="p">,</span><span class="n">debug</span><span class="p">)</span>
+  <span class="c1">############# GET NAMES #####</span>
+  <span class="n">counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rr</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rr</span><span class="p">:</span>
+      <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="n">name_row</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+          <span class="n">names</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">names</span> <span class="o">=</span> <span class="n">line</span>
+  <span class="c1">############################</span>
+  <span class="k">return</span> <span class="n">names</span><span class="o">.</span><span class="n">split</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="gvv_to_df">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.gvv_to_df">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gvv_to_df</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">skiprows</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  read amber 1drism .gvv file and return a</span>
+<span class="sd">  pandas dataframe with proper headers</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+  <span class="c1">#rism_1d_data =</span>
+  <span class="n">names</span> <span class="o">=</span> <span class="n">read_gvv_and_get_names</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="n">skiprows</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_solute">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.load_solute">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">load_solute</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">infile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    read the intermediate file generated by gmxtop2solute</span>
+<span class="sd">    and return a dictionary with molecules and atom names, params etc</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># mole_name atom_name mass charge sigma epsilon</span>
+    <span class="c1"># or</span>
+    <span class="c1"># name      mole idx grp      charge       sigma     epsilon</span>
+    <span class="n">read_flag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mol_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mol_double_counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">()</span>
+    <span class="n">to_debug</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="s2">&quot;# [ LOAD SOLUTE ]: &quot;</span><span class="p">,</span><span class="n">debug</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># TODO: optimize</span>
+    <span class="n">stage</span> <span class="o">=</span> <span class="n">to_debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING FILE:</span><span class="si">{</span><span class="n">infile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1">####################################################</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rr</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+          <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">read_flag</span><span class="p">:</span>
+          <span class="c1">#tmp = line.split()</span>
+          <span class="n">t_name</span><span class="p">,</span><span class="n">t_mol</span><span class="p">,</span><span class="n">t_index</span><span class="p">,</span><span class="n">t_grp</span><span class="p">,</span><span class="n">t_charge</span><span class="p">,</span><span class="n">t_sigma</span><span class="p">,</span><span class="n">t_eps</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+          <span class="n">stage</span> <span class="o">=</span> <span class="n">to_debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="s2">&quot;t_name,t_mol,t_index,t_grp,t_charge,t_sigma,t_eps&quot;</span><span class="p">)</span>
+          <span class="n">stage</span> <span class="o">=</span> <span class="n">to_debug</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_mol</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_index</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_grp</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_charge</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_sigma</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">t_eps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+          <span class="c1"># need to make sure we dont double up on mol names...</span>
+          <span class="k">if</span> <span class="n">t_name</span> <span class="ow">in</span> <span class="n">mol_names</span><span class="p">:</span>
+            <span class="n">mol_double_counter</span> <span class="o">+=</span><span class="mi">1</span>
+            <span class="n">t_name</span> <span class="o">=</span> <span class="n">t_name</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mol_double_counter</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="n">mol_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_name</span><span class="p">)</span>
+          <span class="c1"># load em up</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">]</span>     <span class="o">=</span> <span class="p">{}</span> <span class="c1"># TODO: fix</span>
+          <span class="c1">################# NEW MOL #######################</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;mole&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">t_mol</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">t_index</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;grp&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">t_grp</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;charge&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="n">t_charge</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;sigma&quot;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">t_sigma</span>
+          <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">t_name</span><span class="p">][</span><span class="s2">&quot;epsilon&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">t_eps</span>
+          <span class="c1">#t_name,t_mol,t_index,t_grp,t_charge,t_sigma,t_eps</span>
+
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">tmp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+          <span class="k">if</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;molecules&quot;</span><span class="p">:</span>
+            <span class="n">read_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1">####################################################</span>
+    <span class="k">return</span>
+
+<div class="viewcode-block" id="load_solute.load_pdb">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.load_solute.load_pdb">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">load_pdb</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">pdb_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    match names from pdbfile</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">################################### TODO: FIX</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_pdb</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      take names from pdbfile and rename sol file</span>
+<span class="sd">      names are ordered anyways... but be careful</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rr</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">rr</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETAM&quot;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">out_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">=</span><span class="n">res</span>
+      <span class="k">return</span> <span class="n">out_dict</span>
+    <span class="c1">###################################</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">match_pdb</span><span class="p">(</span><span class="n">pdb_filename</span><span class="p">)</span>
+    <span class="c1">#TODO: FIX</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">),(</span><span class="n">exisiting_key</span><span class="p">,</span><span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span><span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+      <span class="c1"># since everything is ordered</span>
+      <span class="c1">#print(f&quot;{val}.{key}&quot;)</span>
+      <span class="c1">#self[t_key][mdl_name] = self[t_key].pop(&quot;TMP_MDL&quot;)</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">exisiting_key</span><span class="p">)</span>
+      <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;mole&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="load_solute.write">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.load_solute.write">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">outname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">outname</span><span class="p">:</span>
+      <span class="c1"># TODO: os. exists rename</span>
+      <span class="n">outname</span> <span class="o">=</span> <span class="s2">&quot;out.sol&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outname</span><span class="p">,</span><span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ww</span><span class="p">:</span>
+      <span class="c1"># TODO: getpass.getuser() datetime.datetime()</span>
+      <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[atom]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;molecules</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">ww</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">[</span><span class="s2">&quot;molecules&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">ww</span><span class="p">)</span>
+        <span class="n">ww</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="get_bond_len_and_names">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.get_bond_len_and_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_bond_len_and_names</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  read .pdb file and return bond names: RES1.ATOM-RES2.ATOM, and distance between them (A). does not</span>
+<span class="sd">  matter if there is a chemical bond</span>
+<span class="sd">  between them.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  :param pdbfile name of file in PDB format</span>
+<span class="sd">  :param debug: run verbose</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span>
+  <span class="c1">#TODO: path, os file stuff</span>
+  <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;# [ GET BOND AND LEN ]:&quot;</span>
+  <span class="n">db</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span><span class="n">tp</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+  <span class="c1">###############################</span>
+  <span class="n">stage</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;READING FILE: </span><span class="si">{</span><span class="n">pdbfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="n">bond_names</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">bond_len</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="c1"># TODO: read into df then pairwise distances</span>
+  <span class="c1"># for now we only assume your solvent structure</span>
+  <span class="c1"># can fit on RAM</span>
+  <span class="n">name_pos</span> <span class="o">=</span> <span class="p">[]</span><span class="c1"># dict() # bad</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETAM&quot;</span><span class="p">):</span>
+            <span class="n">t_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="c1"># yep</span>
+            <span class="c1"># get names</span>
+            <span class="n">name1</span> <span class="o">=</span> <span class="n">t_split</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">res1</span> <span class="o">=</span> <span class="n">t_split</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="c1"># now we have our starting atom. so get position</span>
+            <span class="n">atom1_pos</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">t_split</span><span class="p">[</span><span class="mi">6</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">t_split</span><span class="p">[</span><span class="mi">7</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">t_split</span><span class="p">[</span><span class="mi">8</span><span class="p">])])</span>
+            <span class="c1"># so we find all succeeding atoms</span>
+            <span class="n">name_pos</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res1</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">atom1_pos</span><span class="p">))</span>
+            <span class="c1">#bond_names.append(f&quot;{res1}.{name1}-{res2}.{name2}&quot;)</span>
+  <span class="n">db</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="s2">&quot;COMPLETED, CLOSING FILE&quot;</span><span class="p">)</span>
+  <span class="c1">#return bond_names</span>
+  <span class="c1">#return name_pos</span>
+  <span class="k">return</span> <span class="n">name_pos_dict_to_distances</span><span class="p">(</span><span class="n">name_pos</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="name_pos_dict_to_distances">
+<a class="viewcode-back" href="../../episol.html#episol.fileutils.name_pos_dict_to_distances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">name_pos_dict_to_distances</span><span class="p">(</span><span class="n">in_dict</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="n">conversion</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  input a dictionary file with entrytype</span>
+<span class="sd">  [(&quot;name&quot;,position)].</span>
+<span class="sd">  where position is a list-like</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  :param in_dict: dictionary vide supra</span>
+<span class="sd">  :param conversion: multiply the distance by this value, i.e. pdb A, .sol=nm</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">euclidean</span>
+  <span class="c1"># dont mess it up ^</span>
+  <span class="c1">#TODO: path, os file stuff</span>
+  <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;# [ BOND LEN CALC&#39;ER ]:&quot;</span>
+  <span class="n">db</span> <span class="o">=</span> <span class="n">debugger</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span><span class="n">tp</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+  <span class="c1">###############################</span>
+  <span class="n">stage</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">db</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USING: </span><span class="si">{</span><span class="n">in_dict</span><span class="si">}</span><span class="s2"> WITH </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">in_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> ATOMS&quot;</span><span class="p">)</span>
+  <span class="c1">#bond_names = []</span>
+  <span class="c1">#bond_len = []</span>
+  <span class="n">bond_out</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># bad</span>
+  <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">pos</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">in_dict</span><span class="p">):</span>
+    <span class="c1">#print(&quot;starting with&quot;,name,pos)</span>
+    <span class="c1">#now go to next</span>
+    <span class="k">for</span> <span class="n">ind2</span><span class="p">,</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span><span class="n">pos2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">in_dict</span><span class="p">[</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]):</span>
+      <span class="c1">#print(&quot;creating&quot;,name,name2,&quot;distance&quot;,euclidean(pos,pos2))</span>
+      <span class="n">bond_out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">name2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">euclidean</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">pos2</span><span class="p">)</span><span class="o">*</span><span class="n">conversion</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">bond_out</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/out_4.png" alt="Logo of Epipy Documentation"/>
+            </a></p>
+<h1 class="logo"><a href="../../index.html">Epipy Documentation</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Background for Integral Equation Theory and 3DRISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Epipy and EPISOL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../episol.html">episol package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Jupyter Notebook Tutorial Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, pswanson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>epipy documentation &#8212; Epipy Documentation 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Background for Integral Equation Theory and 3DRISM" href="background.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="epipy-documentation">
+<h1>epipy documentation<a class="headerlink" href="#epipy-documentation" title="Link to this heading">¶</a></h1>
+<p>This website contains the documentation and tutorials for Epipy: a python interface for EPISOL (kernel for 3DRISM calculations).</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background for Integral Equation Theory and 3DRISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing Epipy and EPISOL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episol.html">episol package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Jupyter Notebook Tutorial Gallery</a></li>
+</ul>
+</div>
+<section id="what-is-this">
+<h2>What is this?<a class="headerlink" href="#what-is-this" title="Link to this heading">¶</a></h2>
+<p>Epipy is the python interface for EPISOL and relies on its kernel to perform 3DRISM calculations. Epipy helps the user to setup and automatically modify input files then calls the EPISOL kernel to perform the calculation. Episol solves the 3-dimens
+ional reference interaction site model (3DRISM) equation.</p>
+<p><span class="math notranslate nohighlight">\(h_v({\bf r}) = c_v({\bf r}) + \sum_{v'}\int \rho_{v'}^b c_{v'}({\bf r}')(h_{vv'}(r_{vv'})+s_{vv'}(r_{vv'}))d^3{\bf r}'\)</span></p>
+<p>Via applying the following closure relation in a sef-consistent manner.</p>
+<p><span class="math notranslate nohighlight">\(h_v({\bf r}) = e ^{-u_v({\bf r})/k_BT+h_v({\bf r})-c_v({\bf r})+B_v({\bf r})} - 1\)</span></p>
+<p>Offering 22 available bridge functionals.
+Epipy also includes some helpful functions for post-processing, including extratcing compressed 3DRISM output and loading into an array. Calculations require <em>ONLY</em> a topology , and structure file (ideally .gro).</p>
+<p><code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">episol</span> <span class="pre">import</span> <span class="pre">epipy</span></code></p>
+<p><code class="code docutils literal notranslate"><span class="pre">example</span> <span class="pre">=</span> <span class="pre">epipy(&quot;structure.gro&quot;,&quot;topology.top&quot;)</span></code></p>
+<p>Setting grid-resolution, and number of SCF cycles follows:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">example.rism(step=1000,resolution=0.5)</span></code></p>
+<p>and finally, calling the kernel to perform the cacluation</p>
+<p><code class="code docutils literal notranslate"><span class="pre">example.kernel()</span></code></p>
+<p>This writes the relevant grid-based data to a .ts4s file, and epipy will automatically extract our desired values given a selection command</p>
+<p><code class="code docutils literal notranslate"><span class="pre">data</span> <span class="pre">=</span> <span class="pre">example.select_grid('guv')</span></code></p>
+<p>See our example library for example calculations..</p>
+</section>
+<section id="why">
+<h2>Why?<a class="headerlink" href="#why" title="Link to this heading">¶</a></h2>
+<p>I originally created epipy for use in high-throughput calculations across a distributed computing environment. It calls on the <a class="reference external" href="https://github.com/EPISOLrelease/EPISOL">EPISOL</a>. library to perform 3DRISM calculations. I made epipy fit into one file/module to make it as efficient as possible. Big updates are planned so stay tuned, and  report any bugs/issues <a class="reference external" href="https://github.com/EPISOLrelease/EPIPY">here</a>.</p>
+</section>
+<section id="how-to-cite">
+<h2>How to cite<a class="headerlink" href="#how-to-cite" title="Link to this heading">¶</a></h2>
+<p>If you liked this. please cite:</p>
+<p>Swanson, P. C.; Cao, S.; Huang, X. A Python Tutorial for 3DRISM Solvation Calculations of Chemical and Biological Molecules. The Journal of Chemical Physics 2025, 163 (17). <a class="reference external" href="https://doi.org/10.1063/5.0299937">https://doi.org/10.1063/5.0299937</a>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/out_4.png" alt="Logo of Epipy Documentation"/>
+            </a></p>
+<h1 class="logo"><a href="#">Epipy Documentation</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background for Integral Equation Theory and 3DRISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing Epipy and EPISOL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episol.html">episol package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Jupyter Notebook Tutorial Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="background.html" title="next chapter">Background for Integral Equation Theory and 3DRISM</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, pswanson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

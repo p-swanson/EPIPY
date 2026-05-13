@@ -168,17 +168,35 @@ nt :: int(), number of threads to use</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="episol.epipy.epipy.placement">
-<span class="sig-name descname"><span class="pre">placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_waters_to_place</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.9269073728633292</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_pdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out.pdb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.placement" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_waters_to_place</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_to_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'O'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.9269073728633292</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_pdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out.pdb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.placement" title="Link to this definition">¶</a></dt>
+<dd><p>function selects top distribution
+then places water there, then removes that density
+and continues to look. kind of like placevent.
+=============================
+filename:: txt file containing density, format is:
+(columns) x,y,z val_1 (oxygen) val_2 (hydrogen) val_3 (your mixture)
+inputgrid:: md.Grid object
+outname:: string for pdb file
+num_waters_to_place:: number of waters to place
+radius:: distance around selected point to omit from remaining placement
+ideal_radius = ((10**3)/(4/3)/(np.pi)/33.3679)**(1/3) based on number density of water
+grid_spacing:: conversion from array indices to angstrom, units of 1/A
+the program automatically converts for you but you can override if need be</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_waters_to_place</strong> (<em>int</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_waters_to_place</strong> (<em>int</em>)</p></li>
+<li><p><strong>write_pdb</strong> (<em>bool</em>)</p></li>
+<li><p><strong>outname</strong> (<em>str</em>)</p></li>
+<li><p><strong>weight</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="episol.epipy.epipy.reader">
-<span class="sig-name descname"><span class="pre">reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">laplacian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LoG</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.52</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.reader" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">laplacian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LoG</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.52</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_to_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'O'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.reader" title="Link to this definition">¶</a></dt>
 <dd><p>This function takes in an uncompressed dump file txt file
 it reads the grid size and shape
 If specified we can save/export to a dx file which can be loaded into pymol/vmd/etc.
@@ -252,7 +270,11 @@ excess : mu^ex at each grid</p>
 <span class="sig-name descname"><span class="pre">select_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sele</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_sele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_fact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/episol/epipy.html#epipy.select_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#episol.epipy.epipy.select_coords" title="Link to this definition">¶</a></dt>
 <dd><p>in_file: .gro file
 sele: selection string -&gt; resname only so far
-returns:</p>
+returns: array of coordinates
+!!! needs updating because its dumb !!!
+========
+conv_fact: convert from nm to grid-bits
+for .gro this is X nm*(10A/1nm)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

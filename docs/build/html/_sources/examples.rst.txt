@@ -45,3 +45,12 @@ Using Oragnic Solvents
 
    examples/organic_solvent/*
 
+Organic Solvents as a mixture: Cyanide and Water 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. nbgallery::
+   :glob:
+   :maxdepth: 1
+
+   examples/cyanide_and_water_around_methane/*
+
